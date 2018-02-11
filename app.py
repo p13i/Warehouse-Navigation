@@ -3,15 +3,13 @@ Initializes server and exposes API endpoints
 """
 from flask import Flask, request
 import networkx as nx
-from wms.warehouse import get_simple_warehouse, get_larger_warehouse, get_georgia_tech_library_warehouse
+from wms.warehouse import get_simple_warehouse, get_larger_warehouse, get_georgia_tech_library_warehouse, w
 import json
 
 app = Flask(__name__)
 
 WAREHOUSES = {
-    'simple': get_simple_warehouse(),
-    'larger': get_larger_warehouse(),
-    'georgia-tech': get_georgia_tech_library_warehouse(),
+    'georgia-tech': w(),
 }
 
 

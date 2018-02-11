@@ -3,7 +3,6 @@ import networkx as nx
 from tsp import tsp_circuit
 from utils import manhattan_distance
 
-
 PositionType = typing.Tuple[int, int]
 
 
@@ -16,7 +15,7 @@ class GridWarehouse(object):
         self.dimensions = dimensions
         self.grid = grid
         self.graph = self._construct_graph()
-    
+
     def find_path(self, from_node, to_node):  # type: (PositionType, PositionType) -> [PositionType]
         return nx.shortest_path(self.graph, from_node, to_node)
 
@@ -52,7 +51,6 @@ class GridWarehouse(object):
 
         return final_path
 
-
     def distance(self, from_cell, to_cell):
         """
         Admissible distance heuristic for this warehouse
@@ -66,7 +64,7 @@ class GridWarehouse(object):
             for cell in column:
                 if isinstance(cell, NavigableTileCell):
                     column_strings.append("+")
-                elif isinstance(cell, ShelvingCell):
+                elif isinstance(cell, ShelvingColumnCell):
                     column_strings.append("x")
                 else:
                     raise TypeError("Unknown cell type: %s" % type(cell))
@@ -111,7 +109,8 @@ class GridWarehouse(object):
         neighbors = []
 
         for offset_x, offset_y in offsets:
-            neighbor_coordinate_to_examine = (origin_cell_coordinates[0] + offset_x, origin_cell_coordinates[1] + offset_y)
+            neighbor_coordinate_to_examine = (
+            origin_cell_coordinates[0] + offset_x, origin_cell_coordinates[1] + offset_y)
 
             if neighbor_coordinate_to_examine[0] < 0 or neighbor_coordinate_to_examine[0] >= self.dimensions[0]:
                 continue
@@ -129,6 +128,11 @@ class GridWarehouse(object):
         return neighbors
 
 
+########################
+# GRID WAREHOUSE CELLS #
+########################
+
+
 class GridWarehouseCell(object):
     pass
 
@@ -140,23 +144,36 @@ class Direction(object):
     WEST = 4
 
 
-class ShelvingCell(GridWarehouseCell):
-    items = None  # type: [Item]
+class ShelvingColumnCell(GridWarehouseCell):
+    rows = None  # type: [Item]
     direction = None  # type: Direction
 
-    def __init__(self, direction, items=None):
+    def __init__(self, aisle_label, column_label, direction, shelves=None):
+        self.aisle_label = aisle_label
+        self.column_label = column_label
         self.direction = direction
-        self.items = items or []
+        self.rows = shelves or []
+
+
+class Shelve(object):
+    def __init__(self, shelve_label, item):
+        self.shelve_label = shelve_label
+        self.item = item
 
 
 class NavigableTileCell(GridWarehouseCell):
     pass
 
 
-class Item(object):
-    name = None  # type: str
-    rfid = None  # type: str
+#########
+# ITEMS #
+#########
 
-    def __init__(self, name, rfid):
-        self.name = name
-        self.rfid = rfid
+class Item(object):
+    pass
+
+
+class Book(Item):
+    def __init__(self, title, author):
+        self.title = title
+        self.author = author
